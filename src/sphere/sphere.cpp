@@ -1,4 +1,4 @@
-#include "parametric_sphere.h"
+#include "sphere.h"
 #include <iostream>
 #include <QDebug>
 #include <array>
@@ -11,22 +11,13 @@
 
 namespace  {
 
-void add_vec(const GLfloat v1[3], const GLfloat v2[3], GLfloat newV[3])
-{
-    newV[0] = v1[0] + v2[0];    // x
-    newV[1] = v1[1] + v2[1];    // y
-    newV[2] = v1[2] + v2[2];    // z
-    Utils::normalize3(newV);
+void addTriangleVertices(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, std::vector<GLfloat>& vertices) {
+    Utils::insertBack(vertices, { v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z });
 }
 
-void addTriangle(const GLfloat v1[3], const GLfloat v2[3], const GLfloat v3[3], std::vector<GLfloat>& vec, std::vector<GLfloat>& vec2) {
-    vec.insert(vec.end(), {v1[0], v1[1], v1[2]});
-    vec.insert(vec.end(), {v2[0], v2[1], v2[2]});
-    vec.insert(vec.end(), {v3[0], v3[1], v3[2]});
-}
-
-void addIndices(unsigned int a, unsigned int b, unsigned int c, std::vector<GLuint>& vec) {
-    vec.insert(vec.end(), { a, b, c });
+glm::vec3 getVertex(unsigned int index, const std::vector<GLfloat>& vertices) {
+    const GLfloat* t = &vertices[index];
+    return glm::vec3{t[0], t[1], t[2]};
 }
 
 }
@@ -137,44 +128,44 @@ Sphere::Sphere(int width, int height, Utils::Demo typeDemo, Utils::Type typeSphe
 }
 
 void Sphere::makeParametricSphere() {
-    float alpha;
-    float alpha2;
-    float beta;
     unsigned int vertex_id = 0;
-    static const float div  = 20;
+    static const float div  = 22;
     static const float stepAlpha = M_PI / div;
     static const float stepBeta = (2 * M_PI) / div;
 
+    // iterate on alpha angle, i.e height of the sphere
     for(unsigned int i = 0; i < div ; ++i) {
-        alpha = -M_PI/2 + i * stepAlpha;
-        alpha2 = -M_PI/2 + (i+1) * stepAlpha;
+        float alpha = -M_PI/2 + i * stepAlpha;
+        float alpha2 = -M_PI/2 + (i+1) * stepAlpha;
         unsigned int start_strip_index = vertex_id;
-
+        // iterate on beta angle, i.e width of the sphere
         for(unsigned int j = 0; j < div - 1 ; ++j) {
-            beta = j * stepBeta;
+            float beta = j * stepBeta;
 
-            _vertices.insert(_vertices.end(), { cos(alpha) * cos(beta), sin(alpha), cos(alpha) * sin(beta) });
-            _normals.insert(_normals.end(), { cos(alpha) * cos(beta), sin(alpha), cos(alpha) * sin(beta) });
-            _vertices.insert(_vertices.end(), { cos(alpha2) * cos(beta), sin(alpha2), cos(alpha2) * sin(beta) });
-            _normals.insert(_normals.end(), { cos(alpha2) * cos(beta), sin(alpha2), cos(alpha2) * sin(beta) });
+            Utils::insertBack( _vertices, { cos(alpha) * cos(beta), sin(alpha), cos(alpha) * sin(beta) });
+            Utils::insertBack( _vertices, { cos(alpha2) * cos(beta), sin(alpha2), cos(alpha2) * sin(beta) });
 
-            _indices.insert(_indices.end(), { vertex_id + 1, vertex_id, vertex_id + 2});
-            _indices.insert(_indices.end(), { vertex_id + 2, vertex_id + 3, vertex_id + 1 });
+            Utils::insertBack( _normals, { cos(alpha) * cos(beta), sin(alpha), cos(alpha) * sin(beta) });
+            Utils::insertBack( _normals, { cos(alpha2) * cos(beta), sin(alpha2), cos(alpha2) * sin(beta) });
+
+            Utils::insertBack( _indices, { vertex_id + 1, vertex_id, vertex_id + 2});
+            Utils::insertBack( _indices, { vertex_id + 2, vertex_id + 3, vertex_id + 1 });
 
             vertex_id += 2;
-
         }
 
         float last_strip_beta = (div - 1) * stepBeta;
-        _vertices.insert(_vertices.end(), { cos(alpha) * cos(last_strip_beta), sin(alpha), cos(alpha) * sin(last_strip_beta) });
-        _normals.insert(_normals.end(), { cos(alpha) * cos(last_strip_beta), sin(alpha), cos(alpha) * sin(last_strip_beta) });
-        _vertices.insert(_vertices.end(), { cos(alpha2) * cos(last_strip_beta), sin(alpha2), cos(alpha2) * sin(last_strip_beta) });
-        _normals.insert(_normals.end(), { cos(alpha2) * cos(last_strip_beta), sin(alpha2), cos(alpha2) * sin(last_strip_beta) });
+
+        Utils::insertBack( _vertices, { cos(alpha) * cos(last_strip_beta), sin(alpha), cos(alpha) * sin(last_strip_beta) });
+        Utils::insertBack( _vertices, { cos(alpha2) * cos(last_strip_beta), sin(alpha2), cos(alpha2) * sin(last_strip_beta) });
+
+        Utils::insertBack( _normals, { cos(alpha2) * cos(last_strip_beta), sin(alpha2), cos(alpha2) * sin(last_strip_beta) });
+        Utils::insertBack( _normals, { cos(alpha) * cos(last_strip_beta), sin(alpha), cos(alpha) * sin(last_strip_beta) });
+
+        Utils::insertBack( _indices, { vertex_id + 1, vertex_id, start_strip_index });
+        Utils::insertBack( _indices, { start_strip_index , start_strip_index + 1, vertex_id + 1 });
 
         vertex_id += 2;
-
-        _indices.insert(_indices.end(), { vertex_id - 1, vertex_id - 2 , start_strip_index });
-        _indices.insert(_indices.end(), { start_strip_index , start_strip_index + 1, vertex_id -1 });
     }
 }
 
@@ -228,42 +219,40 @@ void Sphere::makeIcosahedralSphere() {
         7,2,11
     };
 
-    const auto nb_subdiv = 2;
-    std::vector<GLfloat> computed_vertices;
-    std::vector<GLuint> computed_indices;
-    const GLfloat *v1, *v2, *v3;
-    GLfloat newV1[3], newV2[3], newV3[3];
+    static const unsigned int nb_subdivision = 2;
+    static constexpr unsigned int nb_vertex_icosahedron = 12;
 
-    for(unsigned int i = 0; i < nb_subdiv; ++i) {
-        auto index = 0;
-        computed_vertices = _vertices;
-        computed_indices = _indices;
+    for(unsigned int i = 0; i < nb_subdivision; ++i) {
+        unsigned int vertex_id = 0;
+        std::vector<GLfloat> computed_vertices = _vertices;
+        std::vector<GLuint> computed_indices = _indices;
         _vertices.clear();
         _indices.clear();
 
         for(unsigned int j = 0; j < computed_indices.size(); j += DIM_3) {
-            // get 3 vertices of a triangle
-            v1 = &computed_vertices[computed_indices[j] * 3];
-            v2 = &computed_vertices[computed_indices[j + 1] * 3];
-            v3 = &computed_vertices[computed_indices[j + 2] * 3];
+            // get 3 vertices of a current triangle
+            glm::vec3 current_v1 = getVertex( computed_indices[j] * DIM_3, computed_vertices);
+            glm::vec3 current_v2 = getVertex( computed_indices[j + 1] * DIM_3, computed_vertices);
+            glm::vec3 current_v3 = getVertex( computed_indices[j + 2] * DIM_3, computed_vertices);
+            // make the 3 new vertices, after have 6 vertices to make our 4 new triangles
+            glm::vec3 new_v1 = normalize(current_v1 + current_v2);
+            glm::vec3 new_v2 = normalize(current_v2 + current_v3);
+            glm::vec3 new_v3 = normalize(current_v1 + current_v3);
+            // now, we can add the vertices of 4 new triangles we obtained
+            addTriangleVertices(current_v1, new_v1, new_v3, _vertices);
+            addTriangleVertices(new_v1, current_v2, new_v2, _vertices);
+            addTriangleVertices(new_v1, new_v2, new_v3, _vertices);
+            addTriangleVertices(new_v3, new_v2, current_v3, _vertices);
+            // and add the indices of 4 new triangles too
+            Utils::insertBack( _indices, { vertex_id,   vertex_id + 1, vertex_id + 2 } );
+            Utils::insertBack( _indices, { vertex_id + 3, vertex_id + 4, vertex_id + 5 } );
+            Utils::insertBack( _indices, { vertex_id + 6, vertex_id + 7, vertex_id + 8 } );
+            Utils::insertBack( _indices, { vertex_id + 9, vertex_id + 10,vertex_id + 11 } );
 
-            add_vec(v1, v2, newV1);
-            add_vec(v2, v3, newV2);
-            add_vec(v1, v3, newV3);
-
-            addTriangle(v1, newV1, newV3, _vertices, _normals);
-            addTriangle(newV1, v2, newV2, _vertices, _normals);
-            addTriangle(newV1, newV2, newV3, _vertices, _normals);
-            addTriangle(newV3, newV2, v3, _vertices, _normals);
-
-            addIndices(index,   index+1, index+2, _indices);
-            addIndices(index+3, index+4, index+5, _indices);
-            addIndices(index+6, index+7, index+8, _indices);
-            addIndices(index+9, index+10,index+11, _indices);
-            index += 12;
+            vertex_id += nb_vertex_icosahedron;
         }
     }
-
+    // we are in unitary measure, here normals are just our vertices !
     _normals = _vertices;
 }
 

@@ -1,7 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-
+#include <vector>
+#include <glm/vec3.hpp>
+#include <gl.h>
+#include <QString>
 
 namespace Utils {
 
@@ -16,9 +19,16 @@ enum class Type {
     ICOSAHEDRON
 };
 
-float norm3(const float v[3]);
+template<typename T>
+void insertBack(std::vector<T>& vec, const std::initializer_list<T>&& list) {
+    vec.insert(vec.end(), std::move(list));
+}
 
-void normalize3(float v1[3]);
+void loadOBJFile(const std::string& path, std::vector<GLfloat>& vertices,
+                                      std::vector<GLfloat>& normals,
+                                      std::vector<GLuint>& indices );
+
+
 
 }
 

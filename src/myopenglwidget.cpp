@@ -7,8 +7,8 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "hello_triangles/hellotriangles.h"
-#include "parametric_sphere/parametric_sphere.h"
+#include "sphere/sphere.h"
+#include "obj3pointslight/obj3pointslight.h"
 #include "utils.h"
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenGLFunctions_4_1_Core()*/, _openglDemo(nullptr), _lastime(0) {
@@ -36,6 +36,10 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenG
     _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
         std::cout << "Icosahedral Sphere With Ligthning" << std::endl;
         return new Sphere(width, height, Utils::Demo::LIGHT_VIEW, Utils::Type::ICOSAHEDRON);
+        } );
+    _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
+        std::cout << "OBJ Loaded (Cone) with 3 points lighting" << std::endl;
+        return new OBJ3PointsLight(width, height);
         } );
 }
 
@@ -128,7 +132,6 @@ void MyOpenGLWidget::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_Right:
         case Qt::Key_Down:
             _openglDemo->keyboardmove(event->key()-Qt::Key_Left, 1./100/*double(_lastime)/10.*/);
-            //qDebug() << event->key()-Qt::Key_Left;
             update();
         break;
         // Wireframe key

@@ -9,6 +9,8 @@ static const char* vertex_shader_error;
 static const char* fragment_shader_error;
 static const char* vertex_shader_lightning;
 static const char* fragment_shader_lightning;
+static const char* vertex_shader_3lightning;
+static const char* fragment_shader_3lightning;
 
 };
 
