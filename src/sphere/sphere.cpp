@@ -77,8 +77,8 @@ Sphere::Sphere(int width, int height, Utils::Demo typeDemo, Utils::Type typeSphe
             glShaderSource(fragmentshader, 1, &Shaders::fragment_shader_error, NULL);
             break;
         case Utils::Demo::LIGHT_VIEW :
-            glShaderSource(vertexshader, 1, &Shaders::vertex_shader_lightning, NULL);
-            glShaderSource(fragmentshader, 1, &Shaders::fragment_shader_lightning, NULL);
+            glShaderSource(vertexshader, 1, &Shaders::vertex_shader_lighting, NULL);
+            glShaderSource(fragmentshader, 1, &Shaders::fragment_shader_lighting, NULL);
             break;
         default:
             break;
@@ -129,7 +129,7 @@ Sphere::Sphere(int width, int height, Utils::Demo typeDemo, Utils::Type typeSphe
 
 void Sphere::makeParametricSphere() {
     unsigned int vertex_id = 0;
-    static const float div  = 22;
+    static const float div  = 13;
     static const float stepAlpha = M_PI / div;
     static const float stepBeta = (2 * M_PI) / div;
 
@@ -170,14 +170,6 @@ void Sphere::makeParametricSphere() {
 }
 
 void Sphere::makeIcosahedralSphere() {
-    // the gold number
-    //static const double goldNumber = (1 + sqrt(5)) / 2;
-    // factor to multipy the edges of the gold rectangle, to have a perfectly normalized sphere
-    //static const double normalizationFactor = 2.f / sqrt(1 + goldNumber * goldNumber);
-    // now we can define our two values for the icosahedron mesh
-    //static const double X_coor = normalizationFactor / 2;
-    //static const double Z_coor = (goldNumber * normalizationFactor) / 2;
-
     #define X 0.525731112119133606
     #define Z 0.850650808352039932
 
@@ -219,7 +211,7 @@ void Sphere::makeIcosahedralSphere() {
         7,2,11
     };
 
-    static const unsigned int nb_subdivision = 2;
+    static constexpr unsigned int nb_subdivision = 2;
     static constexpr unsigned int nb_vertex_icosahedron = 12;
 
     for(unsigned int i = 0; i < nb_subdivision; ++i) {

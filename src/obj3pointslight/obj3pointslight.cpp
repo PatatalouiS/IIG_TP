@@ -55,8 +55,8 @@ OBJ3PointsLight::OBJ3PointsLight(int width, int height) :
     fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
     // 2. set the source
 
-    glShaderSource(vertexshader, 1, &Shaders::vertex_shader_3lightning, NULL);
-    glShaderSource(fragmentshader, 1, &Shaders::fragment_shader_3lightning, NULL);
+    glShaderSource(vertexshader, 1, &Shaders::vertex_shader_3lighting, NULL);
+    glShaderSource(fragmentshader, 1, &Shaders::fragment_shader_3lighting, NULL);
 
     // 3. Compile
     glCompileShader(vertexshader);
