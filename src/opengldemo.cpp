@@ -41,7 +41,6 @@ void OpenGLDemo::mousewheel(float ) {
 }
 
 void OpenGLDemo::keyboardmove(int , double ) {
-
 }
 
 bool OpenGLDemo::keyboard(unsigned char ) {

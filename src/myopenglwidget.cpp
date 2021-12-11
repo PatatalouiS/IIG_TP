@@ -7,39 +7,25 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "sphere/sphere.h"
-#include "obj3pointslight/obj3pointslight.h"
 #include "utils.h"
+
+#include "PnTriangles/pntriangles.h"
+#include "PhongTessellation/phongtessellation.h"
+#include "cubemap/cubemap.h"
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenGLFunctions_4_1_Core()*/, _openglDemo(nullptr), _lastime(0) {
     // add all demo constructors here
     _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "Parametric Sphere With Normals Colored" << std::endl;
-        return new Sphere(width, height, Utils::Demo::NORMALS_VIEW, Utils::Type::PARAMETRIC);
+        std::cout << "PN Triangles Tessellation" << std::endl;
+        return new PNTriangles(width, height);
         } );
     _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "Parametric Sphere With Error" << std::endl;
-        return new Sphere(width, height, Utils::Demo::ERROR_VIEW, Utils::Type::PARAMETRIC);
+        std::cout << "Phong Tesselation" << std::endl;
+        return new PhongTessellation(width, height);
         } );
     _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "Parametric Sphere With Ligthning" << std::endl;
-        return new Sphere(width, height, Utils::Demo::LIGHT_VIEW, Utils::Type::PARAMETRIC);
-        } );
-    _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "Icosahedral Sphere With Normals Colored" << std::endl;
-        return new Sphere(width, height, Utils::Demo::NORMALS_VIEW, Utils::Type::ICOSAHEDRON);
-        } );
-    _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "Icosahedral Sphere With Error" << std::endl;
-        return new Sphere(width, height, Utils::Demo::ERROR_VIEW, Utils::Type::ICOSAHEDRON);
-        } );
-    _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "Icosahedral Sphere With Ligthning" << std::endl;
-        return new Sphere(width, height, Utils::Demo::LIGHT_VIEW, Utils::Type::ICOSAHEDRON);
-        } );
-    _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "OBJ Loaded (Cone) with 3 points lighting" << std::endl;
-        return new OBJ3PointsLight(width, height);
+        std::cout << "Cubemap(SkyBox)" << std::endl;
+        return new CubeMap(width, height);
         } );
 }
 
@@ -66,7 +52,7 @@ void MyOpenGLWidget::initializeGL() {
 
     if (!initializeOpenGLFunctions()) {
         QMessageBox::critical(this, "OpenGL initialization error", "MyOpenGLWidget::initializeGL() : Unable to initialize OpenGL functions");
-        exit(1);
+        exit(0);
     }
     // Initialize OpenGL and all OpenGL dependent stuff below
     activatedemo(0);
@@ -124,7 +110,7 @@ void MyOpenGLWidget::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_7:
         case Qt::Key_8:
         case Qt::Key_9:
-            activatedemo(event->key()-Qt::Key_0);
+            activatedemo(event->key()-Qt::Key_0 - 1);
         break;
         // Move keys
         case Qt::Key_Left:

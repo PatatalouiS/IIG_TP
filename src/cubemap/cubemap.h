@@ -1,5 +1,6 @@
-#ifndef SIMPLECAMERA_H
-#define SIMPLECAMERA_H
+#ifndef CUBEMAP_H
+#define CUBEMAP_H
+
 
 #include "opengldemo.h"
 
@@ -9,13 +10,14 @@
 #include <functional>
 #include "../utils.h"
 
+#include "../mesh.h"
+#include "../shader.h"
 
 /** Simple drawing demonstration
  */
-class Sphere : public OpenGLDemo {
+class CubeMap : public OpenGLDemo {
 public:
-    explicit Sphere(int width, int height, Utils::Demo typeDemo, Utils::Type typeSphere);
-    ~Sphere() override;
+    explicit CubeMap(int width, int height);
 
     void resize(int width, int height) override;
     void draw() override;
@@ -30,24 +32,11 @@ private:
     void makeParametricSphere();
     void makeIcosahedralSphere();
 
-    // A simple geometry
-    std::vector<GLfloat> _vertices;
-    std::vector<GLfloat> _normals;
-    std::vector<GLuint> _indices;
-
-    // OpenGL object for geometry
-    GLuint _vao;
-    GLuint _vbo;
-    GLuint _nbo;
-    GLuint _ebo;
-
-    // Shader program for rendering
-    GLuint _program;
-
     // for mouse management
     int _button; // 0 --> left. 1 --> right. 2 --> middle. 3 --> other
     float _mousex{0};
     float _mousey{0};
+    bool m_mode = true;
 
     // Camera
     using CameraSelector=std::function<Camera*()>;
@@ -60,9 +49,17 @@ private:
     glm::mat4 _model;
     glm::mat4 _view;
     glm::mat4 _projection;
+
+    // Meshs to draw
+    Mesh m_meshCubeMap;
+    Mesh m_obj;
+
+    // Shader
+    Shader m_shaderCubeMap;
+    Shader m_shaderOBJ;
+
+    // Textures
+    GLuint m_textureCubeMap;
 };
 
-/*------------------------------------------------------------------------------------------------------------------------*/
-
-
-#endif // SIMPLECAMERA_H
+#endif // CUBEMAP_H

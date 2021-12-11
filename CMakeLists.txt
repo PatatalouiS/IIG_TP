@@ -2,13 +2,17 @@ project(IIG3D-BaseTP)
 
 ############################################
 # Configure CMake and GCC flags
-cmake_minimum_required(VERSION 2.8.9) # Minimal version compatible QT5
+cmake_minimum_required(VERSION 2.8.12) # Minimal version compatible QT5
 CMAKE_POLICY(SET CMP0043 NEW) # This will silence the Cmake Warning "Policy CMP0043 is not set"
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic")
-#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -pedantic")
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/usr/local/homebrew/lib/cmake/assimp-5.1")
+
+IF(POLICY CMP0012)
+CMAKE_POLICY(SET CMP0012 NEW)
+ENDIF()
+
 
 find_package(Qt5 COMPONENTS OpenGL REQUIRED)
 if (Qt5OpenGL_FOUND)
@@ -16,7 +20,10 @@ if (Qt5OpenGL_FOUND)
 else (Qt5OpenGL_FOUND)
     message(EROR "Unable to find QTOpenGL library")
 endif(Qt5OpenGL_FOUND)
+
 find_package(OpenGL REQUIRED) # define OPENGL_LIBRARIES
+
+find_package(ASSIMP REQUIRED)
 
 #OpenGL deprecated on MacosX : remove compilation warning
 add_definitions(-DGL_SILENCE_DEPRECATION)
@@ -41,10 +48,21 @@ FILE(GLOB_RECURSE
     ${CMAKE_SOURCE_DIR}/src/*.ui
 )
 
+FILE(GLOB_RECURSE
+	folder_shader
+	${CMAKE_SOURCE_DIR}/shaders/*.vert
+	${CMAKE_SOURCE_DIR}/shaders/*.frag
+	${CMAKE_SOURCE_DIR}/shaders/*.tesc
+	${CMAKE_SOURCE_DIR}/shaders/*.tese
+	${CMAKE_SOURCE_DIR}/shaders/*.glsl
+)
+
 include_directories(
    ${CMAKE_SOURCE_DIR}/src
    ${CMAKE_SOURCE_DIR}/glm
 )
+
+message(STATUS ${ASSIMP_LIBRARY_DIRS})
 
 SOURCE_GROUP("Source Files" FILES ${folder_source})
 SOURCE_GROUP("Header Files" FILES ${folder_header})
@@ -64,9 +82,10 @@ set( CMAKE_INCLUDE_CURRENT_DIR ON )
 add_executable(${PROJECT_NAME}
                ${folder_source}
                ${folder_header}
+			   ${folder_shader}
                ${folder_ui}
                )
 
-set(EXT_LIBS Qt5::OpenGL ${OPENGL_LIBRARIES})
+set(EXT_LIBS Qt5::OpenGL ${OPENGL_LIBRARIES} ${ASSIMP_LIBRARIES})
 
-target_link_libraries(${PROJECT_NAME} ${EXT_LIBS} )
+target_link_libraries(${PROJECT_NAME} ${EXT_LIBS})

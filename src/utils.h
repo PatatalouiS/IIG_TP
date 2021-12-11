@@ -5,6 +5,7 @@
 #include <glm/vec3.hpp>
 #include <gl.h>
 #include <QString>
+#include "mesh.h"
 
 namespace Utils {
 
@@ -28,6 +29,11 @@ void loadOBJFile(const std::string& path, std::vector<GLfloat>& vertices,
                                       std::vector<GLfloat>& normals,
                                       std::vector<GLuint>& indices );
 
+std::string read_shader_file (const std::string& shaderFile);
+
+void loadOBJFile2(const std::string &fileName, std::vector<GLfloat>& vertices,
+                     std::vector<GLuint>& indices, std::vector<GLfloat>& normals,
+                  std::vector<GLfloat>& coord);
 
 
 }

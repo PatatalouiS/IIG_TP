@@ -1,5 +1,5 @@
-#ifndef POINTSLIGHT_H
-#define POINTSLIGHT_H
+#ifndef PHONG_TESS_H
+#define PHONG_TESS_H
 
 #include "opengldemo.h"
 
@@ -9,13 +9,14 @@
 #include <functional>
 #include "../utils.h"
 
+#include "../mesh.h"
+#include "../shader.h"
 
 /** Simple drawing demonstration
  */
-class OBJ3PointsLight : public OpenGLDemo {
+class PhongTessellation : public OpenGLDemo {
 public:
-    explicit OBJ3PointsLight(int width, int height);
-    ~OBJ3PointsLight() override;
+    explicit PhongTessellation(int width, int height);
 
     void resize(int width, int height) override;
     void draw() override;
@@ -26,24 +27,13 @@ public:
     bool keyboard(unsigned char k) override;
 
 private:
-    // A simple geometry
-    std::vector<GLfloat> _vertices;
-    std::vector<GLfloat> _normals;
-    std::vector<GLuint> _indices;
-
-    // OpenGL object for geometry
-    GLuint _vao;
-    GLuint _vbo;
-    GLuint _nbo;
-    GLuint _ebo;
-
-    // Shader program for rendering
-    GLuint _program;
 
     // for mouse management
     int _button; // 0 --> left. 1 --> right. 2 --> middle. 3 --> other
     float _mousex{0};
     float _mousey{0};
+
+    unsigned int tessLevel = 5;
 
     // Camera
     using CameraSelector=std::function<Camera*()>;
@@ -56,9 +46,12 @@ private:
     glm::mat4 _model;
     glm::mat4 _view;
     glm::mat4 _projection;
+
+    // Mesh to draw
+    Mesh m_mesh;
+
+    // Shader
+    Shader m_shader;
 };
 
-/*------------------------------------------------------------------------------------------------------------------------*/
-
-
-#endif // SIMPLECAMERA_H
+#endif // PHONG_TESS_H
