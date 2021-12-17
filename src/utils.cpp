@@ -1,7 +1,6 @@
 
 #include "utils.h"
 #include <cmath>
-#include <gl.h>
 
 #include <QString>
 #include <sstream>
@@ -13,12 +12,14 @@
 #include <glm/detail/func_geometric.hpp>
 #include <fstream>
 #include <regex>
+#include <glm/vec3.hpp>
 #include <iostream>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 using namespace std;
+using namespace glm;
 
 namespace {
 
@@ -126,5 +127,44 @@ std::string  Utils::read_shader_file (const std::string& shaderFile) {
     file.close();
 
     return sstr.str();
+}
+
+Mesh Utils::makeCylinder(vec3 base, vec3 axis,
+                  float radius, float length, int subdiv1, int subdiv2){
+
+    std::vector<GLfloat> vertices;
+    std::vector<GLfloat> normals;
+    std::vector<GLuint> indices;
+
+    vec3 x = vec3(1,0,0); //orthogonal(axis);
+    vec3 y = cross(axis, x);
+
+    for(int i=0; i<subdiv2; i++)
+    {
+        float offset = float(i)/float(subdiv2-1);
+        float offset2 = (offset-0.5)*length;
+        for(int j=0; j<subdiv1; j++)
+        {
+            float angle = 2.*glm::pi<float>()*float(j)/float(subdiv1);
+            glm::vec3 position;
+            glm::vec3 normal;
+            position = base+offset2*axis+radius*cos(angle)*x+radius*sin(angle)*y;
+            normal = normalize(cos(angle)*x+sin(angle)*y);
+            vertices.push_back(position.x); vertices.push_back(position.y); vertices.push_back(position.z);
+            normals.push_back(normal.x); normals.push_back(normal.y); normals.push_back(normal.z);
+        }
+    }
+
+
+    for(int i=0; i<subdiv2-1; i++)
+    {
+        for(int j=0; j<subdiv1; j++)
+        {
+            indices.push_back(i*subdiv1+j); indices.push_back(i*subdiv1+(j+1)%subdiv1); indices.push_back(i*subdiv1+j+subdiv1);
+            indices.push_back(i*subdiv1+(j+1)%subdiv1); indices.push_back(i*subdiv1+j+subdiv1); indices.push_back(i*subdiv1+(j+1)%subdiv1+subdiv1);
+        }
+    }
+
+    return Mesh(vertices, indices, normals, GL_PATCHES);
 }
 

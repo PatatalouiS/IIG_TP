@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     openglWidget = new MyOpenGLWidget(this);
 
     openglWidget->setFocus();
-    setWindowTitle("TP IIG - OpenGL");
+    setWindowTitle("TP OpenGL M2 IGAI");
     setCentralWidget(openglWidget);
     resize(800, 500);
      openglWidget->resize(openglWidget->sizeHint());

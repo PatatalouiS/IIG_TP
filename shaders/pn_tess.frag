@@ -1,5 +1,6 @@
 
 #version 410 core
+
 in vec3 Normal_FS_in;
 in vec3 worldPosition;
 in vec3 position;
@@ -19,6 +20,6 @@ void main() {
     vec3 key_light = max(dot(norm_, dir_key_light), 0.0) * light_color * 1.75;
     vec3 fill_light = max(dot(norm_, dir_fill_light), 0.0) * light_color * 0.5;
     vec3 back_light = max(dot(norm_, dir_back_light), 0.0) * light_color * 2;
-    vec3 main_color = vec3(normalize(Normal_FS_in)*0.5+0.5);
+	vec3 main_color = vec3(normalize(Normal_FS_in)*0.5+0.5);
     general_color = vec4((key_light + fill_light + back_light) * main_color * 0.8, 1.0);
 }

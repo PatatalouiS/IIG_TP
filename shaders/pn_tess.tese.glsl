@@ -33,16 +33,8 @@ struct ControlPoints
 patch in ControlPoints CP;
 
 out vec3 worldPosition;
-//out vec2 TexCoord_FS_in;
 out vec3 Normal_FS_in;
 out vec3 position;
-
-/*
-vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)
-{
-    return vec2(gl_TessCoord.x) * v0 + vec2(gl_TessCoord.y) * v1 + vec2(gl_TessCoord.z) * v2;
-}
-*/
 
 void main()
 {

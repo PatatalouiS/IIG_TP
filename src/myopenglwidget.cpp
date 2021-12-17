@@ -12,6 +12,7 @@
 #include "PnTriangles/pntriangles.h"
 #include "PhongTessellation/phongtessellation.h"
 #include "cubemap/cubemap.h"
+#include "animation/animation.h"
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenGLFunctions_4_1_Core()*/, _openglDemo(nullptr), _lastime(0) {
     // add all demo constructors here
@@ -26,6 +27,10 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenG
     _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
         std::cout << "Cubemap(SkyBox)" << std::endl;
         return new CubeMap(width, height);
+        } );
+    _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
+        std::cout << "Animation" << std::endl;
+        return new Animation(width, height);
         } );
 }
 
@@ -55,7 +60,7 @@ void MyOpenGLWidget::initializeGL() {
         exit(0);
     }
     // Initialize OpenGL and all OpenGL dependent stuff below
-    activatedemo(0);
+    activatedemo(3);
     _openglDemo->resize(1000, 1000);
     update();
 }
